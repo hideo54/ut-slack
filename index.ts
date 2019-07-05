@@ -1,7 +1,6 @@
 import { WebClient } from '@slack/web-api';
 import { RTMClient } from '@slack/rtm-api';
 import * as puppeteer from 'puppeteer';
-import * as fs from 'fs';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -22,6 +21,8 @@ const plugins = [
     const rtmClient = new RTMClient(token);
     const webClient = new WebClient(token);
     const browser = await puppeteer.launch({headless: true});
+
+    rtmClient.start().catch(err => console.log(err));
 
     // Tools
     const channels = (await webClient.channels.list()).channels as Channel[];

@@ -7,7 +7,7 @@ export default async (clients, tools) => {
         if (data.subtype === 'add') {
             const message = await webClient.chat.postMessage({
                 channel: randomChannelID,
-                text: `絵文字\`:${data.name}:\`が追加されました:+1:`,
+                text: `絵文字 \`:${data.name}:\` が追加されました:+1:`,
                 username: 'emoji-notifier',
                 icon_emoji: `:${data.name}:`,
             });
@@ -17,10 +17,10 @@ export default async (clients, tools) => {
                 timestamp: message.ts
             });
         } else if (data.subtype === 'remove') {
-            const names = data.names.map(name => `\`${name}:\``);
+            const names = data.names.map(name => `\`:${name}:\``);
             await webClient.chat.postMessage({
                 channel: randomChannelID,
-                text: `絵文字\`:${names}:\`が削除されました:cry:`,
+                text: `絵文字 ${names} が削除されました:cry:`,
                 username: 'emoji-notifier',
                 icon_emoji: ':innocent:',
             });
