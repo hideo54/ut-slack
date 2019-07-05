@@ -12,6 +12,7 @@ interface Channel {
 const plugins = [
     require('./emoji-notifier'),
     require('./channel-notifier'),
+    require('./kanaiWatcher'),
 ];
 
 (async () => {
