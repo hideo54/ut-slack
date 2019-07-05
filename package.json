@@ -17,7 +17,7 @@
     "@types/puppeteer": "^1.12.4"
   },
   "scripts": {
-    "build": "tsc *.ts",
+    "build": "tsc",
     "develop": "ts-node index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
