@@ -43,11 +43,7 @@ const parseNotice = async (dt: Element, dd: Element) => {
         isImportant = true;
     } else {
         const element = dd.children[1] as HTMLImageElement;
-        if (element.alt === '重要') {
-            isImportant = true;
-        } else {
-            isImportant = false;
-        }
+        isImportant = element.alt === '重要';
         isPDF = !isImportant;
     }
     let body;
