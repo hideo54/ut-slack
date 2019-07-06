@@ -59,8 +59,30 @@ const parseNotice = async (dt: Element, dd: Element) => {
         const bodyElement = new JSDOM(source).window.document.getElementById('newslist2');
         bodyElement.removeChild(bodyElement.children[0]); // To remove date, targets
         bodyElement.removeChild(bodyElement.children[0]); // To remove title
-        body.plainText = bodyElement.textContent.trim();
+
         body.HTML = bodyElement.innerHTML;
+
+        const brList = bodyElement.getElementsByTagName('br') as HTMLCollection;
+        for (const br of Array.from(brList)) {
+            br.outerHTML = '\n';
+        }
+        const pList = bodyElement.getElementsByTagName('p') as HTMLCollection;
+        for (const p of Array.from(pList)) {
+            p.outerHTML += '\n';
+        }
+
+        body.plainText = bodyElement.textContent.trim();
+
+        const aList = bodyElement.getElementsByTagName('a') as HTMLCollection;
+        for (const a of Array.from(aList)) {
+            const element = a as HTMLLinkElement
+            element.outerHTML = `[[${element.href}|${element.textContent}]]`;
+        }
+        body.withLinkForSlack = bodyElement
+            .textContent
+            .trim()
+            .replace(/\[\[/g, '<')
+            .replace(/\]\]/g, '>');
     }
     return { date, category, target, title, link, body, isPDF, isImportant };
 };
@@ -113,7 +135,7 @@ export default async (clients, tools) => {
                 if (notice.body !== undefined) {
                     fields.push({
                         title: '本文',
-                        value: notice.body.plainText,
+                        value: notice.body.withLinkForSlack,
                         short: false
                     });
                 }
@@ -127,7 +149,7 @@ export default async (clients, tools) => {
                 channel: channel,
                 text: '<http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/firstyear/index.html|教務課からのお知らせ>が更新されました。',
                 attachments,
-                icon_emoji: `:ut:`,
+                icon_emoji: `:ut-logo:`,
             });
         }
     });
