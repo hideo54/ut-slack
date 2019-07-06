@@ -1,18 +1,23 @@
+import axios from 'axios';
+import { JSDOM } from 'jsdom';
+import * as iconv from 'iconv-lite';
 import * as fs from 'fs';
 import * as diff from 'diff';
 import * as schedule from 'node-schedule';
 
-const patrol = async (browser, cacheName) => {
-    const page = await browser.newPage();
-    await page.goto('https://www.ms.u-tokyo.ac.jp/~mkanai/culc1/');
+const patrol = async cacheName => {
+    const url = 'https://www.ms.u-tokyo.ac.jp/~mkanai/culc1/';
+    const source_SJIS = (await axios.get(url, {
+        responseType: 'arraybuffer',
+    })).data;
+    const source = iconv.decode(source_SJIS, 'Shift_JIS');
+    const dom = new JSDOM(source).window.document.body;
+    const latestContent = {
+        source: dom.innerHTML,
+        text: dom.textContent
+    };
     const cache = JSON.parse(fs.readFileSync(cacheName, 'utf-8'));
     const cachedContent = cache.kanaiWatcher;
-    const latestContent = await page.evaluate(() => {
-        return {
-            source: document.body.innerHTML,
-            text: document.body.innerText
-        };
-    });
     const diffs = diff.diffChars(cachedContent.text, latestContent.text).filter(diff => diff.added || diff.removed);
     cache.kanaiWatcher = latestContent;
     fs.writeFileSync(cacheName, JSON.stringify(cache));
@@ -21,7 +26,7 @@ const patrol = async (browser, cacheName) => {
 
 export default async (clients, tools) => {
     schedule.scheduleJob('*/10 * * * *', async () => {
-        const diffs = await patrol(clients.browser, tools.cacheName);
+        const diffs = await patrol(tools.cacheName);
         if (diffs.length > 0) {
             const channel = tools.channelIDDetector('微分積分学1');
             const attachments = diffs.map(diff => {
