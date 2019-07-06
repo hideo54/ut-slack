@@ -12,6 +12,7 @@ const plugins = [
     require('./emoji-notifier'),
     require('./channel-notifier'),
     require('./kanaiWatcher'),
+    require('./kyomuWatcher'),
 ];
 
 (async () => {
