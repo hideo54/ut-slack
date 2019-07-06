@@ -1,6 +1,5 @@
 import { WebClient } from '@slack/web-api';
 import { RTMClient } from '@slack/rtm-api';
-import * as puppeteer from 'puppeteer';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -21,7 +20,6 @@ const plugins = [
     // Clients
     const rtmClient = new RTMClient(token);
     const webClient = new WebClient(token);
-    const browser = await puppeteer.launch({headless: true});
 
     rtmClient.start().catch(err => console.log(err));
 
@@ -34,7 +32,7 @@ const plugins = [
 
     await Promise.all(plugins.map(async plugin => {
         await plugin.default(
-            {webClient, rtmClient, browser},
+            {webClient, rtmClient},
             {channelIDDetector, cacheName});
     }));
 })();
