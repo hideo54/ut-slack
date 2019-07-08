@@ -18,7 +18,7 @@ const patrol = async cacheName => {
     };
     const cache = JSON.parse(fs.readFileSync(cacheName, 'utf-8'));
     const cachedContent = cache.kanaiWatcher;
-    const diffs = diff.diffChars(cachedContent.text, latestContent.text).filter(diff => diff.added || diff.removed);
+    const diffs = diff.diffTrimmedLines(cachedContent.text, latestContent.text).filter(diff => diff.added || diff.removed);
     cache.kanaiWatcher = latestContent;
     fs.writeFileSync(cacheName, JSON.stringify(cache));
     return diffs;
@@ -29,26 +29,29 @@ export default async (clients, tools) => {
         const diffs = await patrol(tools.cacheName);
         if (diffs.length > 0) {
             const channel = tools.channelIDDetector('微分積分学1');
-            const attachments = diffs.map(diff => {
+            const attachments = [];
+            for (const diff of diffs) {
+                diff.value = diff.value.replace(/\n/g, '');
+                if (diff.value === '') continue;
                 if (diff.added) {
-                    return {
+                    attachments.push({
                         "fields": [{
                             "title": "追加:",
                             "value": diff.value
                         }],
                         "color": "good"
-                    };
+                    });
                 }
                 if (diff.removed) {
-                    return {
+                    attachments.push({
                         "fields": [{
                             "title": "削除:",
                             "value": diff.value
                         }],
                         "color": "danger"
-                    };
+                    });
                 }
-            });
+            }
             await clients.webClient.chat.postMessage({
                 channel: channel,
                 text: '<https://www.ms.u-tokyo.ac.jp/~mkanai/culc1/|金井先生のWebサイト>が更新されました。',
