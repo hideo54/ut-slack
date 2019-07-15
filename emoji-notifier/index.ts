@@ -15,6 +15,10 @@ export default async (clients, tools) => {
                 name: data.name,
                 channel: message.channel,
                 timestamp: message.ts
+            }).then(value => {
+                tools.logger.info(`Notified addition of :${data.name}: emoji to the Slack`);
+            }).catch(error => {
+                tools.logger.error(`Failed to notified addition of :${data.name}: emoji to the Slack: ${error}`);
             });
         } else if (data.subtype === 'remove') {
             const names = data.names.map(name => `\`:${name}:\``);
@@ -23,6 +27,10 @@ export default async (clients, tools) => {
                 text: `絵文字 ${names} が削除されました:cry:`,
                 username: 'emoji-notifier',
                 icon_emoji: ':innocent:',
+            }).then(value => {
+                tools.logger.info(`Notified deletion of ${names} emoji to the Slack`);
+            }).catch(error => {
+                tools.logger.error(`Failed to notify deletion of ${names} emoji to the Slack: ${error}`);
             });
         }
     });

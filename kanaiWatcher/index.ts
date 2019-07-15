@@ -57,7 +57,13 @@ export default async (clients, tools) => {
                 text: '<https://www.ms.u-tokyo.ac.jp/~mkanai/culc1/|金井先生のWebサイト>が更新されました。',
                 attachments,
                 icon_emoji: `:kanai:`,
+            }).then(value => {
+                tools.logger.info(`Posted update(s) on Kanai website to the Slack with this attachment: ${JSON.stringify(attachments)}`);
+            }).catch(error => {
+                tools.logger.error(`Failed to post update(s) on Kanai website to the Slack: ${error}`);
             });
+        } else {
+            tools.logger.info('Got no updates on Kanai website');
         }
     });
 };

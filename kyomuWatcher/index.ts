@@ -146,7 +146,13 @@ export default async (clients, tools) => {
                 text: '<http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/firstyear/index.html|教務課からのお知らせ>が更新されました。',
                 attachments,
                 icon_emoji: `:ut-logo:`,
+            }).then(value => {
+                tools.logger.info(`Posted update(s) on Kyomu website to the Slack with this attachment: ${JSON.stringify(attachments)}`);
+            }).catch(error => {
+                tools.logger.error(`Failed to post update(s) on Kyomu website to the Slack: ${error}`);
             });
+        } else {
+            tools.logger.info('Got no updates on Kyomu website');
         }
     });
 };
