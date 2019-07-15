@@ -15,20 +15,16 @@ const plugins = [
     require('./kyomuWatcher'),
 ];
 
-(async () => {
     const token = process.env.SLACK_BOT_TOKEN;
 
     // Clients
     const rtmClient = new RTMClient(token);
     const webClient = new WebClient(token);
 
-    rtmClient.start().catch(err => console.log(err));
-
+(async () => {
     // Tools
     const channels = (await webClient.channels.list()).channels as Channel[];
-    const channelIDDetector = name => {
-        return channels.filter(channel => channel.name === name )[0].id;
-    };
+    const channelIDDetector = name => channels.filter(channel => channel.name === name )[0].id;
     const cacheName = `${__dirname}/cache.json`;
 
     await Promise.all(plugins.map(async plugin => {
