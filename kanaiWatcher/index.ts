@@ -28,6 +28,7 @@ export default async (clients, tools) => {
     schedule.scheduleJob('*/10 * * * *', async () => {
         const diffs = await patrol(tools.cacheName);
         if (diffs.length > 0) {
+            tools.logger.log('Got new diffs.');
             const channel = tools.channelIDDetector('微分積分学1');
             const attachments = [];
             for (const diff of diffs) {
@@ -62,8 +63,6 @@ export default async (clients, tools) => {
             }).catch(error => {
                 tools.logger.error(`Failed to post update(s) on Kanai website to the Slack: ${error}`);
             });
-        } else {
-            tools.logger.info('Got no updates on Kanai website');
         }
     });
 };

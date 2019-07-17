@@ -113,6 +113,7 @@ export default async (clients, tools) => {
     schedule.scheduleJob('*/10 * * * *', async () => {
         const news = await patrol(tools.cacheName);
         if (news.length > 0) {
+            tools.logger.log('Got new diffs.');
             const channel = tools.channelIDDetector('random');
             const attachments = news.map(notice => {
                 const title = `${notice.isImportant ? '[重要]' : ''} ${notice.title} ${notice.isPDF ? '(PDF)' : ''}`;
@@ -151,8 +152,6 @@ export default async (clients, tools) => {
             }).catch(error => {
                 tools.logger.error(`Failed to post update(s) on Kyomu website to the Slack: ${error}`);
             });
-        } else {
-            tools.logger.info('Got no updates on Kyomu website');
         }
     });
 };
