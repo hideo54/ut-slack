@@ -110,7 +110,7 @@ const patrol = async cacheName => {
 };
 
 export default async (clients, tools) => {
-    schedule.scheduleJob('*/10 * * * *', async () => {
+    schedule.scheduleJob('30 */10 * * * *', async () => {
         const news = await patrol(tools.cacheName);
         if (news.length > 0) {
             tools.logger.log('Got new diffs.');
