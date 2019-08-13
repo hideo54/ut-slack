@@ -18,7 +18,7 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@types/puppeteer": "^1.12.4"
+    "@types/puppeteer": "^1.19.1"
   },
   "scripts": {
     "build": "tsc",
