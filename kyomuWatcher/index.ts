@@ -116,7 +116,7 @@ export default async (clients, tools) => {
             tools.logger.info('Got new diffs');
             const channel = tools.channelIDDetector('random');
             const callsMember: boolean = news.filter(notice => notice.isImportant).length > 0;
-            const text = `${callsMember ? '@channel ' : ''}<http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/firstyear/index.html|教務課からのお知らせ>が更新されました。`;
+            const text = `${callsMember ? '<!channel> ' : ''}<http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/firstyear/index.html|教務課からのお知らせ>が更新されました。`;
             const attachments = news.map(notice => {
                 const title = `${notice.isImportant ? '[重要]' : ''} ${notice.title} ${notice.isPDF ? '(PDF)' : ''}`;
                 const fields = [
