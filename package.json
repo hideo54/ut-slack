@@ -17,9 +17,6 @@
     "typescript": "^3.5.3",
     "winston": "^3.2.1"
   },
-  "devDependencies": {
-    "@types/puppeteer": "^1.12.4"
-  },
   "scripts": {
     "build": "tsc",
     "develop": "ts-node index.ts",
