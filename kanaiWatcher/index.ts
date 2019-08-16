@@ -28,7 +28,7 @@ export default async (clients, tools) => {
     schedule.scheduleJob('*/10 * * * *', async () => {
         const diffs = await patrol(tools.cacheName);
         if (diffs.length > 0) {
-            tools.logger.log('Got new diffs.');
+            tools.logger.info('Got new diffs.');
             const channel = tools.channelIDDetector('微分積分学1');
             const attachments = [];
             for (const diff of diffs) {
