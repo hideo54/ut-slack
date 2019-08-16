@@ -115,6 +115,8 @@ export default async (clients, tools) => {
         if (news.length > 0) {
             tools.logger.info('Got new diffs');
             const channel = tools.channelIDDetector('random');
+            const callsMember: boolean = news.filter(notice => notice.isImportant).length > 0;
+            const text = `${callsMember ? '@channel ' : ''}<http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/firstyear/index.html|教務課からのお知らせ>が更新されました。`;
             const attachments = news.map(notice => {
                 const title = `${notice.isImportant ? '[重要]' : ''} ${notice.title} ${notice.isPDF ? '(PDF)' : ''}`;
                 const fields = [
@@ -143,9 +145,7 @@ export default async (clients, tools) => {
                 };
             });
             await clients.webClient.chat.postMessage({
-                channel: channel,
-                text: '<http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/firstyear/index.html|教務課からのお知らせ>が更新されました。',
-                attachments,
+                channel, text, attachments,
                 icon_emoji: `:ut-logo:`,
             }).then(value => {
                 tools.logger.info(`Posted update(s) on Kyomu website to the Slack with this attachment: ${JSON.stringify(attachments)}`);
