@@ -2,6 +2,7 @@ import axios from 'axios';
 import { JSDOM } from 'jsdom';
 import * as fs from 'fs';
 import * as schedule from 'node-schedule';
+import { stripIndent } from 'common-tags';
 
 const parseNotice = async (dt: Element, dd: Element) => {
     const date = dt.textContent;
@@ -48,7 +49,7 @@ const parseNotice = async (dt: Element, dd: Element) => {
     }
     let body;
     if (isPDF) {
-        body = undefined
+        body = undefined;
     } else {
         body = {};
         const source = (await axios.get(link)).data;
@@ -83,24 +84,32 @@ const parseNotice = async (dt: Element, dd: Element) => {
     return { date, category, target, title, link, body, isPDF, isImportant };
 };
 
-const patrol = async cacheName => {
+const patrol = async tools => {
     const url = 'http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/firstyear/index.html';
     const source = (await axios.get(url)).data;
     const list = new JSDOM(source).window.document.querySelector('#newslist2 > dl');
-    const cache = JSON.parse(fs.readFileSync(cacheName, 'utf-8'));
+    const cache = JSON.parse(fs.readFileSync(tools.cacheName, 'utf-8'));
     const cachedLatestTitle = cache.kyomuWatcher.latestTitle;
     let index;
+    const titles = []; // For providing information useful for debugging
     for (let i = 0; i < 20; i += 2) { 
     // 確認できる限り過去最も更新された日は4/1の8回。
     // よってさすがに10個チェックしたら十分だろう。
         const title = list.children[i+1].firstChild.textContent;
-        if (title == cachedLatestTitle) {
+        titles.push(title);
+        if (title.trim() == cachedLatestTitle) {
             index = i;
             break;
         }
     }
-    cache.kyomuWatcher.latestTitle = list.children[1].textContent;
-    fs.writeFileSync(cacheName, JSON.stringify(cache));
+    if (index) {
+        cache.kyomuWatcher.latestTitle = list.children[1].textContent.trim();
+        fs.writeFileSync(tools.cacheName, JSON.stringify(cache));
+    } else {
+        tools.logger.error(stripIndent`A error occurred when trying to get a diff.
+            cachedLatestTitle: "${cachedLatestTitle}"
+            titles: ${titles.map(x => `"${x}"`).join(', ')}`);
+    }
     let news = [];
     while (index > 0) {
         index -= 2;
@@ -111,7 +120,7 @@ const patrol = async cacheName => {
 
 export default async (clients, tools) => {
     schedule.scheduleJob('30 */10 * * * *', async () => {
-        const news = await patrol(tools.cacheName);
+        const news = await patrol(tools);
         if (news.length > 0) {
             tools.logger.info('Got new diffs');
             const channel = tools.channelIDDetector('random');
