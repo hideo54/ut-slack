@@ -3,7 +3,6 @@ import scrapeIt from 'scrape-it';
 import { JSDOM } from 'jsdom';
 import * as fs from 'fs';
 import * as schedule from 'node-schedule';
-import { stripIndent } from 'common-tags';
 
 const common = 'http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/images/common';
 enum Category {
