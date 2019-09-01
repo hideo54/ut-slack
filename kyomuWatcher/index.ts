@@ -160,6 +160,8 @@ const patrol = async tools => {
             newNotices.push(detailedNotice);
         }
     }
+    cache.kyomuWatcher.latestURL = notices[0].url;
+    fs.writeFileSync(tools.cacheName, JSON.stringify(cache));
     return newNotices;
 };
 
