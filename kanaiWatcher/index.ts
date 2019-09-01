@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { JSDOM } from 'jsdom';
+import cheerio from 'cheerio';
 import * as iconv from 'iconv-lite';
 import * as fs from 'fs';
 import * as diff from 'diff';
@@ -11,10 +11,10 @@ const patrol = async cacheName => {
         responseType: 'arraybuffer',
     })).data;
     const source = iconv.decode(source_SJIS, 'Shift_JIS');
-    const dom = new JSDOM(source).window.document.body;
+    const body = cheerio.load(source, { decodeEntities: false })('body');
     const latestContent = {
-        source: dom.innerHTML,
-        text: dom.textContent
+        source: body.html(),
+        text: body.text(),
     };
     const cache = JSON.parse(fs.readFileSync(cacheName, 'utf-8'));
     const cachedContent = cache.kanaiWatcher;
