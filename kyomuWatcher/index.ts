@@ -66,6 +66,10 @@ const parseBody = async (notice: Notice) => {
     for (const p of Array.from(pList)) {
         p.outerHTML += '\n';
     }
+    const tableList = bodyElement.getElementsByTagName('table') as HTMLCollection;
+    for (const table of Array.from(tableList)) {
+        table.outerHTML = '[表が含まれています。リンク先のウェブページを確認してください。]';
+    }
     Object.assign(body, { plainText: bodyElement.textContent.trim() });
 
     const aList = bodyElement.getElementsByTagName('a') as HTMLCollection;
@@ -194,7 +198,7 @@ export default async (clients, tools) => {
                     });
                 }
                 return {
-                    title, fields, 
+                    title, fields,
                     title_link: notice.url,
                     color: notice.isImportant ? 'good' : ''
                 };
