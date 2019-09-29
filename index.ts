@@ -16,8 +16,8 @@ const logger = winston.createLogger({
 });
 
 interface Channel {
-    id: string,
-    name: string,
+    id: string;
+    name: string;
 }
 
 const plugins = [

@@ -29,7 +29,7 @@ export default async (clients, tools) => {
         const diffs = await patrol(tools.cacheName);
         if (diffs.length > 0) {
             tools.logger.info('Got new diffs.');
-            const channel = tools.channelIDDetector('微分積分学1');
+            const channel = tools.channelIDDetector('微分積分学');
             const attachments = [];
             for (const diff of diffs) {
                 diff.value = diff.value.replace(/\n/g, '');
