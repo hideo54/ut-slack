@@ -150,20 +150,19 @@ const patrol = async tools => {
         Object.assign(notices[i], meta[i]);
     }
     const cache = JSON.parse(fs.readFileSync(tools.cacheName, 'utf-8'));
-    const cachedLatestURL = cache.kyomuWatcher.latestURL;
+    const cachedLatestURLs = cache.kyomuWatcher.latestURLs;
     const newNotices: Notice[] = [];
-    for (const notice of notices) {
-        if (notice.url === cachedLatestURL) {
-            break;
-        }
-        if (notice.isPDF) {
-            newNotices.push(notice);
-        } else {
-            const detailedNotice = await parseBody(notice);
-            newNotices.push(detailedNotice);
+    for (const notice of notices.slice(0, 5)) {
+        if (!cachedLatestURLs.includes(notice.url)) {
+            if (notice.isPDF) {
+                newNotices.push(notice);
+            } else {
+                const detailedNotice = await parseBody(notice);
+                newNotices.push(detailedNotice);
+            }
         }
     }
-    cache.kyomuWatcher.latestURL = notices[0].url;
+    cache.kyomuWatcher.latestURLs = notices.slice(0, 5).map(notice => notice.url);
     fs.writeFileSync(tools.cacheName, JSON.stringify(cache));
     return newNotices;
 };
