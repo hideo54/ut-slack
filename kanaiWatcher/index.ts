@@ -6,7 +6,7 @@ import * as diff from 'diff';
 import * as schedule from 'node-schedule';
 
 const patrol = async cacheName => {
-    const url = 'https://www.ms.u-tokyo.ac.jp/~mkanai/culc1/';
+    const url = 'https://www.ms.u-tokyo.ac.jp/~mkanai/culc2/';
     const source_SJIS = (await axios.get(url, {
         responseType: 'arraybuffer',
     })).data;
