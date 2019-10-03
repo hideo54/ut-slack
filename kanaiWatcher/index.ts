@@ -5,8 +5,9 @@ import * as fs from 'fs';
 import * as diff from 'diff';
 import * as schedule from 'node-schedule';
 
+const url = 'https://www.ms.u-tokyo.ac.jp/~mkanai/culc2/';
+
 const patrol = async cacheName => {
-    const url = 'https://www.ms.u-tokyo.ac.jp/~mkanai/culc2/';
     const source_SJIS = (await axios.get(url, {
         responseType: 'arraybuffer',
     })).data;
@@ -55,7 +56,7 @@ export default async (clients, tools) => {
             }
             await clients.webClient.chat.postMessage({
                 channel: channel,
-                text: '<https://www.ms.u-tokyo.ac.jp/~mkanai/culc1/|金井先生のWebサイト>が更新されました。',
+                text: `<${url}|金井先生のWebサイト>が更新されました。`,
                 attachments,
                 icon_emoji: `:kanai:`,
             }).then(value => {
