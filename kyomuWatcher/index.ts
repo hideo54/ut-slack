@@ -4,7 +4,8 @@ import { JSDOM } from 'jsdom';
 import * as fs from 'fs';
 import * as schedule from 'node-schedule';
 
-const common = 'http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/images/common';
+// const origin = 'http://www.c.u-tokyo.ac.jp';
+const common = '/zenki/news/kyoumu/images/common';
 enum Category {
     '学籍', '履修', '授業', '試験', '成績', '進学', '教職', '留学', 'システム', '窓口', 'その他',
 }
@@ -148,6 +149,9 @@ const patrol = async tools => {
     const { notices, meta } = scrapedData.data;
     for (const i in notices) {
         Object.assign(notices[i], meta[i]);
+        if (notices[i].url.startsWith('/')) {
+            notices[i].url = `http://www.c.u-tokyo.ac.jp${notices[i].url}`;
+        }
     }
     const cache = JSON.parse(fs.readFileSync(tools.cacheName, 'utf-8'));
     const cachedLatestURLs = cache.kyomuWatcher.latestURLs;
