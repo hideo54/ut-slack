@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom';
 import * as fs from 'fs';
 import * as schedule from 'node-schedule';
 
-// const origin = 'http://www.c.u-tokyo.ac.jp';
+const origin = 'http://www.c.u-tokyo.ac.jp';
 const common = '/zenki/news/kyoumu/images/common';
 enum Category {
     '学籍', '履修', '授業', '試験', '成績', '進学', '教職', '留学', 'システム', '窓口', 'その他',
@@ -76,7 +76,8 @@ const parseBody = async (notice: Notice) => {
     const aList = bodyElement.getElementsByTagName('a') as HTMLCollection;
     for (const a of Array.from(aList)) {
         const element = a as HTMLLinkElement
-        element.outerHTML = `[[${element.href}|${element.textContent}]]`;
+        const url = element.href.startsWith('/') ? origin + element.href : element.href;
+        element.outerHTML = `[[${url}|${element.textContent}]]`;
     }
     Object.assign(body, {
         slackText: bodyElement
