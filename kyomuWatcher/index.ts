@@ -90,7 +90,7 @@ const parseBody = async (notice: Notice) => {
 };
 
 const patrol = async tools => {
-    const url = 'http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/firstyear/index.html';
+    const url = `${origin}/zenki/news/kyoumu/firstyear/index.html`;
     interface Result {
         meta: {
             category: Category;
@@ -151,7 +151,7 @@ const patrol = async tools => {
     for (const i in notices) {
         Object.assign(notices[i], meta[i]);
         if (notices[i].url.startsWith('/')) {
-            notices[i].url = `http://www.c.u-tokyo.ac.jp${notices[i].url}`;
+            notices[i].url = origin + notices[i].url;
         }
     }
     const cache = JSON.parse(fs.readFileSync(tools.cacheName, 'utf-8'));
@@ -179,7 +179,7 @@ export default async (clients, tools) => {
             tools.logger.info('Got new diffs');
             const channel = tools.channelIDDetector('random');
             const callsMember: boolean = newNotices.filter(notice => notice.isImportant).length > 0;
-            const text = '<http://www.c.u-tokyo.ac.jp/zenki/news/kyoumu/firstyear/index.html|教務課からのお知らせ>が更新されました。';
+            const text = `<${origin}/zenki/news/kyoumu/firstyear/index.html|教務課からのお知らせ>が更新されました。`;
             const attachments = newNotices.map(notice => {
                 const title = `${notice.isImportant ? '[重要]' : ''} ${notice.title} ${notice.isPDF ? '(PDF)' : ''}`;
                 const fields = [
