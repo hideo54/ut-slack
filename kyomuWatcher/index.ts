@@ -54,38 +54,47 @@ interface Notice {
 const parseBody = async (notice: Notice) => {
     let body = {};
     const source = (await axios.get(notice.url)).data;
-    const bodyElement = new JSDOM(source).window.document.getElementById('newslist2');
-    bodyElement.removeChild(bodyElement.children[0]); // To remove date, targets
-    bodyElement.removeChild(bodyElement.children[0]); // To remove title
-    Object.assign(body, { HTML: bodyElement.innerHTML });
-
-    const brList = bodyElement.getElementsByTagName('br') as HTMLCollection;
-    for (const br of Array.from(brList)) {
-        br.outerHTML = '\n';
+    try {
+        const bodyElement = new JSDOM(source).window.document.getElementById('newslist2');
+        bodyElement.removeChild(bodyElement.children[0]); // To remove date, targets
+        bodyElement.removeChild(bodyElement.children[0]); // To remove title
+        Object.assign(body, { HTML: bodyElement.innerHTML });
+        
+        const brList = bodyElement.getElementsByTagName('br') as HTMLCollection;
+        for (const br of Array.from(brList)) {
+            br.outerHTML = '\n';
+        }
+        const pList = bodyElement.getElementsByTagName('p') as HTMLCollection;
+        for (const p of Array.from(pList)) {
+            p.outerHTML += '\n';
+        }
+        const tableList = bodyElement.getElementsByTagName('table') as HTMLCollection;
+        for (const table of Array.from(tableList)) {
+            table.outerHTML = '[表が含まれています。リンク先のウェブページを確認してください。]';
+        }
+        Object.assign(body, { plainText: bodyElement.textContent.trim() });
+        
+        const aList = bodyElement.getElementsByTagName('a') as HTMLCollection;
+        for (const a of Array.from(aList)) {
+            const element = a as HTMLLinkElement
+            const url = element.href.startsWith('/') ? origin + element.href : element.href;
+            element.outerHTML = `[[${url}|${element.textContent}]]`;
+        }
+        Object.assign(body, {
+            slackText: bodyElement
+                .textContent
+                .trim()
+                .replace(/\[\[/g, '<')
+                .replace(/\]\]/g, '>')
+        });
+    } catch {
+        const unknownMessage = '[内容の取得に失敗しました。リンク先にアクセスして確認してください。]';
+        Object.assign(body, {
+            HTML: unknownMessage,
+            plainText: unknownMessage,
+            slackText: unknownMessage,
+        })
     }
-    const pList = bodyElement.getElementsByTagName('p') as HTMLCollection;
-    for (const p of Array.from(pList)) {
-        p.outerHTML += '\n';
-    }
-    const tableList = bodyElement.getElementsByTagName('table') as HTMLCollection;
-    for (const table of Array.from(tableList)) {
-        table.outerHTML = '[表が含まれています。リンク先のウェブページを確認してください。]';
-    }
-    Object.assign(body, { plainText: bodyElement.textContent.trim() });
-
-    const aList = bodyElement.getElementsByTagName('a') as HTMLCollection;
-    for (const a of Array.from(aList)) {
-        const element = a as HTMLLinkElement
-        const url = element.href.startsWith('/') ? origin + element.href : element.href;
-        element.outerHTML = `[[${url}|${element.textContent}]]`;
-    }
-    Object.assign(body, {
-        slackText: bodyElement
-            .textContent
-            .trim()
-            .replace(/\[\[/g, '<')
-            .replace(/\]\]/g, '>')
-    });
     return Object.assign(notice, { body });
 };
 
