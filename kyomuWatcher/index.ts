@@ -99,7 +99,7 @@ const parseBody = async (notice: Notice) => {
 };
 
 const patrol = async tools => {
-    const url = `${origin}/zenki/news/kyoumu/firstyear/index.html`;
+    const url = `${origin}/zenki/news/kyoumu/index.html`;
     interface Result {
         meta: {
             category: Category;
