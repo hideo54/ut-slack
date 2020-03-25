@@ -25,6 +25,7 @@ const plugins = [
     require('./channel-notifier'),
     require('./kanaiWatcher'),
     require('./kyomuWatcher'),
+    require('./onlineLectureInfoWatcher'),
 ];
 
 const token = process.env.SLACK_BOT_TOKEN;
@@ -36,7 +37,7 @@ const webClient = new WebClient(token);
 (async () => {
     // Tools
     const channels = (await webClient.channels.list()).channels as Channel[];
-    const channelIDDetector = name => channels.filter(channel => channel.name === name )[0].id;
+    const channelIDDetector = (name: string) => channels.filter(channel => channel.name === name )[0].id;
     const cacheName = `${__dirname}/cache.json`;
 
     await Promise.all(plugins.map(async plugin => {
