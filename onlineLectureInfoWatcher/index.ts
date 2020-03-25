@@ -58,7 +58,7 @@ export default async (clients: Clients, tools: Tools) => {
                 }
             }
             const text = `<${url}|講義オンライン化に関する情報サイト>が更新されました。(前回の更新: ${diffData.lastUpdated})`;
-            const channel = tools.channelIDDetector('bot開発');
+            const channel = tools.channelIDDetector('random');
             const icon_emoji = ':ut-logo:';
             if (attachments.length < 5) {
                 await clients.webClient.chat.postMessage({
