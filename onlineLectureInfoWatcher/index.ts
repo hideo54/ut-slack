@@ -59,17 +59,18 @@ export default async (clients: Clients, tools: Tools) => {
             }
             const text = `<${url}|講義オンライン化に関する情報サイト>が更新されました。(前回の更新: ${diffData.lastUpdated})`;
             const channel = tools.channelIDDetector('random');
+            const username = '講義オンライン化に関する情報サイト';
             const icon_emoji = ':ut-logo:';
             if (attachments.length < 5) {
                 await clients.webClient.chat.postMessage({
-                    channel, text, icon_emoji, attachments,
+                    channel, text, username, icon_emoji, attachments,
                 });
             } else {
                 const response = await clients.webClient.chat.postMessage({
-                    channel, text, icon_emoji,
+                    channel, text, username, icon_emoji,
                 });
                 await clients.webClient.chat.postMessage({
-                    channel, text: '', icon_emoji, attachments,
+                    channel, text: '', username, icon_emoji, attachments,
                     // @ts-ignore
                     thread_ts: response.message.ts,
                 });

@@ -220,6 +220,7 @@ export default async (clients, tools) => {
                 channel,
                 text: callsMember ? `<!channel> ${text}` : text,
                 attachments,
+                username: '教務課からのお知らせ',
                 icon_emoji: `:ut-logo:`,
             }).then(value => {
                 tools.logger.info(`Posted update(s) on Kyomu website to the Slack with this attachment: ${JSON.stringify(attachments)}`);
