@@ -25,6 +25,7 @@ const plugins = [
     require('./channel-notifier'),
     require('./kanaiWatcher'),
     require('./kyomuWatcher'),
+    require('./onlineLectureInfoWatcher'),
 ];
 
 const token = process.env.SLACK_BOT_TOKEN;
