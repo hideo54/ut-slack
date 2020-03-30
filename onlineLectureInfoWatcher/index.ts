@@ -45,7 +45,7 @@ export default async (clients: Clients, tools: Tools) => {
         const diffs = diffData.paragraphDiffs.filter(x => x.added || x.removed);
         if (diffs.length > 0) {
             tools.logger.info('Got new diffs.');
-            const attachments = [];
+            let attachments = [];
             for (const diff of diffs) {
                 for (const value of diff.value) {
                     attachments.push({
@@ -58,23 +58,25 @@ export default async (clients: Clients, tools: Tools) => {
                 }
             }
             const text = `<${url}|講義オンライン化に関する情報サイト>が更新されました。(前回の更新: ${diffData.lastUpdated})`;
-            const channel = tools.channelIDDetector('random');
+            const channel = tools.channelIDDetector('講義オンライン化に関する情報サイト');
             const username = '講義オンライン化に関する情報サイト';
             const icon_emoji = ':ut-logo:';
-            if (attachments.length < 5) {
+            const firstResponse = await clients.webClient.chat.postMessage({
+                channel, text, username, icon_emoji,
+            });
+            // @ts-ignore
+            const thread_ts = firstResponse.message.ts;
+            while (attachments.length > 5) {
                 await clients.webClient.chat.postMessage({
-                    channel, text, username, icon_emoji, attachments,
+                    channel, text, username, icon_emoji, thread_ts,
+                    attachments: attachments.slice(0, 5),
                 });
-            } else {
-                const response = await clients.webClient.chat.postMessage({
-                    channel, text, username, icon_emoji,
-                });
-                await clients.webClient.chat.postMessage({
-                    channel, text: '', username, icon_emoji, attachments,
-                    // @ts-ignore
-                    thread_ts: response.message.ts,
-                });
+                attachments = attachments.slice(5);
             }
+            await clients.webClient.chat.postMessage({
+                channel, text, username, icon_emoji, thread_ts,
+                attachments,
+            });
         }
     });
 };
