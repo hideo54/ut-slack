@@ -1,10 +1,10 @@
 import { WebClient } from '@slack/web-api';
-import { RTMClient } from '@slack/rtm-api';
+import SlackEventAdapter from '@slack/events-api';
 import winston from 'winston';
 
 interface Clients {
     webClient: WebClient;
-    rtmClient: RTMClient;
+    slackEvents: typeof SlackEventAdapter;
 }
 
 interface Tools {
