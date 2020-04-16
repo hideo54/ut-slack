@@ -1,8 +1,8 @@
 export default async (clients, tools) => {
     const webClient = clients.webClient;
-    const rtmClient = clients.rtmClient;
+    const slackEvents = clients.slackEvents;
 
-    rtmClient.on('channel_created', async data => {
+    slackEvents.on('channel_created', async data => {
         const randomChannelID = tools.channelIDDetector('random');
         await webClient.chat.postMessage({
             channel: randomChannelID,

@@ -1,8 +1,8 @@
 import { WebClient } from '@slack/web-api';
-import { RTMClient } from '@slack/rtm-api';
-import * as dotenv from 'dotenv';
+import { createEventAdapter } from '@slack/events-api';
+import dotenv from 'dotenv';
 dotenv.config();
-import * as winston from 'winston';
+import winston from 'winston';
 const logger = winston.createLogger({
     transports: [
         new winston.transports.Console({
@@ -28,11 +28,9 @@ const plugins = [
     require('./onlineLectureInfoWatcher'),
 ];
 
-const token = process.env.SLACK_BOT_TOKEN;
-
 // Clients
-const rtmClient = new RTMClient(token);
-const webClient = new WebClient(token);
+const webClient = new WebClient(process.env.SLACK_BOT_TOKEN);
+const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
 
 (async () => {
     // Tools
@@ -42,15 +40,11 @@ const webClient = new WebClient(token);
 
     await Promise.all(plugins.map(async plugin => {
         await plugin.default(
-            {webClient, rtmClient},
+            {webClient, slackEvents},
             {channelIDDetector, cacheName, logger});
     }));
 })();
 
-rtmClient.on('authenticated', data => {
-    logger.info('Logged in');
-});
-
-rtmClient.start()
-    .then(result => logger.info('Started RTM Client'))
-    .catch(err => logger.error(`Failed to start RTM Client: ${err}`));
+slackEvents.on('error', console.error);
+const port = Number(process.env.SLACK_EVENTS_SERVER_PORT) || 3000;
+slackEvents.start(port).then(() => { console.log(`server listening on port ${port}`) });

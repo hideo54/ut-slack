@@ -1,8 +1,8 @@
 export default async (clients, tools) => {
     const webClient = clients.webClient;
-    const rtmClient = clients.rtmClient;
+    const slackEvents = clients.slackEvents;
 
-    rtmClient.on('emoji_changed', async data => {
+    slackEvents.on('emoji_changed', async data => {
         const randomChannelID = tools.channelIDDetector('random');
         if (data.subtype === 'add') {
             const message = await webClient.chat.postMessage({
