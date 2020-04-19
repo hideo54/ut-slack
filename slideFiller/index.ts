@@ -1,11 +1,17 @@
 import PDFExposer from '@hideo54/pdf-exposer';
 import axios from 'axios';
 import { promises as fs } from 'fs';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const pdfExposer = new PDFExposer();
 
 const generateBlocks = async (fileURL: string, password?: string) => {
-    const res = await axios.get(fileURL, { responseType: 'arraybuffer' });
+    const token = process.env.SLACK_BOT_TOKEN;
+    const res = await axios.get(fileURL, {
+        responseType: 'arraybuffer',
+        headers: { Authorization: `Bearer ${token}`},
+    });
     await fs.writeFile('./tmp.pdf', Buffer.from(res.data), 'binary');
     await pdfExposer.init('./tmp.pdf', password);
     const blocks = pdfExposer.generateSlackBlocks({
@@ -22,7 +28,7 @@ export default async (clients, tools) => {
         const { channel, thread_ts, text } = data;
         if (!thread_ts) return;
         const args = text.split(' ');
-        if (args === '@bot') {
+        if (args[0] === '@fill') {
             const { messages } = await webClient.conversations.history({
                 channel: channel,
                 oldest: thread_ts,
