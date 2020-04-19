@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@hideo54/pdf-exposer": "^1.1.0",
+    "@hideo54/pdf-exposer": "^1.1.1",
     "@slack/events-api": "^2.3.2",
     "@slack/web-api": "^5.1.0",
     "@types/cheerio": "^0.22.13",
