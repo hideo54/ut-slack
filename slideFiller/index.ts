@@ -60,7 +60,7 @@ export default async (clients, tools) => {
             } catch (error) {
                 await webClient.chat.postMessage({
                     channel, thread_ts,
-                    text: `失敗したよ:cry: ${error}`,
+                    text: `失敗したよ:cry: ${JSON.stringify(error)}`,
                     username: 'スライド穴埋めくん',
                     icon_emoji: ':pencil2:',
                 });
