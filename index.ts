@@ -26,6 +26,7 @@ const plugins = [
     require('./kanaiWatcher'),
     require('./kyomuWatcher'),
     require('./onlineLectureInfoWatcher'),
+    require('./slideFiller'),
 ];
 
 // Clients
