@@ -31,7 +31,7 @@ const plugins = [
 
 // Clients
 const webClient = new WebClient(process.env.SLACK_BOT_TOKEN);
-const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
+const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET!);
 
 (async () => {
     // Tools

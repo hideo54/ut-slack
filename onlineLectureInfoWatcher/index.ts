@@ -2,7 +2,6 @@ import scrapeIt from 'scrape-it';
 import { promises as fs } from 'fs';
 import { diffArrays } from 'diff';
 import { scheduleJob } from 'node-schedule';
-import { Clients, Tools } from '../types';
 
 const url = 'https://komabataskforce.wixsite.com/forstudents';
 
@@ -15,7 +14,7 @@ const fetchCurrentSiteData = async () => {
     const result = await scrapeIt<SiteData>(url, {
         lastUpdated: {
             selector: 'div#comp-k8515tfz p',
-            convert: s => s.replace(/^last updated at ([a-zA-Z0-9,: ]*)$/, (m, date) => date),
+            convert: (s: string) => s.replace(/^last updated at ([a-zA-Z0-9,: ]*)$/, (m, date) => date),
         },
         paragraphs: {
             listItem: 'div#comp-k844k5vo p',

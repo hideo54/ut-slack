@@ -1,15 +1,16 @@
 import axios from 'axios';
 import scrapeIt from 'scrape-it';
 import { JSDOM } from 'jsdom';
-import * as fs from 'fs';
-import * as schedule from 'node-schedule';
+import fs from 'fs';
+import schedule from 'node-schedule';
+import { PostMessageCallResult } from '@slack/events-api';
 
 const origin = 'http://www.c.u-tokyo.ac.jp';
 const common = '/zenki/news/kyoumu/images/common';
-enum Category {
-    '学籍', '履修', '授業', '試験', '成績', '進学', '教職', '留学', 'システム', '窓口', 'その他',
-}
-const categoryIcons: {[key in keyof typeof Category]: string} = {
+type Category =
+    | '学籍' | '履修' | '授業' | '試験' | '成績'
+    | '進学' | '教職' | '留学' | 'システム' | '窓口' | 'その他';
+const categoryIcons: {[key in Category]: string} = {
     学籍: `${common}/news_z_1.gif`,
     履修: `${common}/news_z_2.gif`,
     授業: `${common}/news_z_3.gif`,
@@ -23,10 +24,8 @@ const categoryIcons: {[key in keyof typeof Category]: string} = {
     その他: `${common}/news_z_11.gif`,
 };
 
-enum Target {
-    '1年生', '2年生', '1年生, 2年生'
-}
-const targetIcons: {[key in keyof typeof Target]: string} = {
+type Target = '1年生' | '2年生' | '1年生, 2年生';
+const targetIcons: {[key in Target]: string} = {
     '1年生': `${common}/news_z_firstyear.gif`,
     '2年生': `${common}/news_z_secondyear.gif`,
     '1年生, 2年生': `${common}/news_z_all.gif`,
@@ -55,11 +54,11 @@ const parseBody = async (notice: Notice) => {
     let body = {};
     const source = (await axios.get(notice.url)).data;
     try {
-        const bodyElement = new JSDOM(source).window.document.getElementById('newslist2');
+        const bodyElement = new JSDOM(source).window.document.getElementById('newslist2')!;
         bodyElement.removeChild(bodyElement.children[0]); // To remove date, targets
         bodyElement.removeChild(bodyElement.children[0]); // To remove title
         Object.assign(body, { HTML: bodyElement.innerHTML });
-        
+
         const brList = bodyElement.getElementsByTagName('br') as HTMLCollection;
         for (const br of Array.from(brList)) {
             br.outerHTML = '\n';
@@ -72,8 +71,8 @@ const parseBody = async (notice: Notice) => {
         for (const table of Array.from(tableList)) {
             table.outerHTML = '[表が含まれています。リンク先のウェブページを確認してください。]';
         }
-        Object.assign(body, { plainText: bodyElement.textContent.trim() });
-        
+        Object.assign(body, { plainText: bodyElement.textContent!.trim() });
+
         const aList = bodyElement.getElementsByTagName('a') as HTMLCollection;
         for (const a of Array.from(aList)) {
             const element = a as HTMLLinkElement
@@ -82,7 +81,7 @@ const parseBody = async (notice: Notice) => {
         }
         Object.assign(body, {
             slackText: bodyElement
-                .textContent
+                .textContent!
                 .trim()
                 .replace(/\[\[/g, '<')
                 .replace(/\]\]/g, '>')
@@ -93,18 +92,18 @@ const parseBody = async (notice: Notice) => {
             HTML: unknownMessage,
             plainText: unknownMessage,
             slackText: unknownMessage,
-        })
+        });
     }
     return Object.assign(notice, { body });
 };
 
-const patrol = async tools => {
+const patrol = async (tools: Tools) => {
     const url = `${origin}/zenki/news/kyoumu/index.html`;
     interface Result {
         meta: {
             category: Category;
             target: Target;
-        };
+        }[];
         notices: Notice[];
     }
     const scrapedData: scrapeIt.ScrapeResult<Result> = await scrapeIt(url, {
@@ -115,25 +114,21 @@ const patrol = async tools => {
                     selector: 'img:first-child',
                     attr: 'src',
                     convert: src => {
-                        for (const category of Object.keys(categoryIcons)) {
-                            if (src === categoryIcons[category]) {
-                                return category;
-                            }
-                        }
+                        Object.entries(categoryIcons).forEach(([category, categoryIcon]) => {
+                            if (src === categoryIcon) return category;
+                        });
                     },
                 },
                 target: {
                     selector: 'img:last-child',
                     attr: 'src',
                     convert: src => {
-                        for (const target of Object.keys(targetIcons)) {
-                            if (src === targetIcons[target]) {
-                                return target;
-                            }
-                        }
+                        Object.entries(targetIcons).forEach(([target, targetIcon]) => {
+                            if (src === targetIcon) return target;
+                        });
                     },
                 },
-            }
+            },
         },
         notices: {
             listItem: '#newslist2 > dl > dd',
@@ -181,7 +176,7 @@ const patrol = async tools => {
     return newNotices;
 };
 
-export default async (clients, tools) => {
+export default async (clients: Clients, tools: Tools) => {
     schedule.scheduleJob('* * * * *', async () => {
         const newNotices = await patrol(tools);
         if (newNotices.length > 0) {
@@ -194,7 +189,7 @@ export default async (clients, tools) => {
                 const fields = [
                     {
                         title: '種別',
-                        value: notice.category.toString(),
+                        value: notice.category!.toString(),
                         short: true
                     },
                     {
@@ -216,17 +211,18 @@ export default async (clients, tools) => {
                     color: notice.isImportant ? 'good' : ''
                 };
             });
-            await clients.webClient.chat.postMessage({
-                channel,
-                text: callsMember ? `<!channel> ${text}` : text,
-                attachments,
-                username: '教務課からのお知らせ',
-                icon_emoji: `:ut-logo:`,
-            }).then(value => {
+            try {
+                await clients.webClient.chat.postMessage({
+                    channel,
+                    text: callsMember ? `<!channel> ${text}` : text,
+                    attachments,
+                    username: '教務課からのお知らせ',
+                    icon_emoji: `:ut-logo:`,
+                }) as PostMessageCallResult;
                 tools.logger.info(`Posted update(s) on Kyomu website to the Slack with this attachment: ${JSON.stringify(attachments)}`);
-            }).catch(error => {
+            } catch (error) {
                 tools.logger.error(`Failed to post update(s) on Kyomu website to the Slack: ${error}`);
-            });
+            }
         }
     });
 };

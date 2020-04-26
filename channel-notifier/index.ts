@@ -1,8 +1,11 @@
-export default async (clients, tools) => {
+import { ChannelCreated } from "@slack/events-api";
+
+export default async (clients: Clients, tools: Tools) => {
     const webClient = clients.webClient;
     const slackEvents = clients.slackEvents;
 
-    slackEvents.on('channel_created', async data => {
+    // @ts-ignore
+    slackEvents.on('channel_created', async (data: ChannelCreated) => {
         const randomChannelID = tools.channelIDDetector('random');
         await webClient.chat.postMessage({
             channel: randomChannelID,

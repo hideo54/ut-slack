@@ -2,6 +2,7 @@ import PDFExposer from '@hideo54/pdf-exposer';
 import axios from 'axios';
 import { promises as fs } from 'fs';
 import dotenv from 'dotenv';
+import { Message } from '@slack/events-api';
 dotenv.config();
 
 const pdfExposer = new PDFExposer();
@@ -20,11 +21,12 @@ const generateBlocks = async (fileURL: string, password?: string) => {
     return blocks;
 };
 
-export default async (clients, tools) => {
+export default async (clients: Clients, tools: Tools) => {
     const webClient = clients.webClient;
     const slackEvents = clients.slackEvents;
 
-    slackEvents.on('message', async (data) => {
+    // @ts-ignore
+    slackEvents.on('message', async (data: Message) => {
         const { channel, thread_ts, text } = data;
         if (!thread_ts) return;
         const args = text.split(' ');
@@ -35,6 +37,7 @@ export default async (clients, tools) => {
                 latest: thread_ts,
                 inclusive: true,
             });
+            // @ts-ignore
             const files = messages[0].files;
             if (!files) return;
             const file = files[0];

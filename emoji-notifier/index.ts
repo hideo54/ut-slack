@@ -1,8 +1,11 @@
-export default async (clients, tools) => {
+import { EmojiAdded, PostMessageCallResult, EmojiRemoved } from '@slack/events-api';
+
+export default async (clients: Clients, tools: Tools) => {
     const webClient = clients.webClient;
     const slackEvents = clients.slackEvents;
 
-    slackEvents.on('emoji_changed', async data => {
+    // @ts-ignore
+    slackEvents.on('emoji_changed', async (data: EmojiAdded | EmojiRemoved) => {
         const randomChannelID = tools.channelIDDetector('random');
         if (data.subtype === 'add') {
             const message = await webClient.chat.postMessage({
@@ -10,7 +13,7 @@ export default async (clients, tools) => {
                 text: `絵文字 \`:${data.name}:\` が追加されました:+1:`,
                 username: 'emoji-notifier',
                 icon_emoji: `:${data.name}:`,
-            });
+            }) as PostMessageCallResult;
             webClient.reactions.add({
                 name: data.name,
                 channel: message.channel,
