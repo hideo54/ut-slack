@@ -1,10 +1,17 @@
 {
     "compilerOptions": {
+        "target": "esnext",
         "module": "CommonJS",
         "moduleResolution": "node",
+        "strict": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
-        "lib": ["es2015", "es2016", "es2017"]
+        "outDir": "dist",
+        "lib": [ "esnext" ],
+        "baseUrl": "./",
+        "paths": {
+            "*": [ "types/*" ]
+        }
     },
     "include": [
         "**/*"
