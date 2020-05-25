@@ -25,7 +25,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "develop": "ts-node -P tsconfig.json index.ts",
+    "develop": "TS_NODE_FILES=true ts-node -P tsconfig.json index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
