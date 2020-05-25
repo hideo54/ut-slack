@@ -114,18 +114,18 @@ const patrol = async (tools: Tools) => {
                     selector: 'img:first-child',
                     attr: 'src',
                     convert: src => {
-                        Object.entries(categoryIcons).forEach(([category, categoryIcon]) => {
+                        for (const [category, categoryIcon] of Object.entries(categoryIcons)) {
                             if (src === categoryIcon) return category;
-                        });
+                        }
                     },
                 },
                 target: {
                     selector: 'img:last-child',
                     attr: 'src',
                     convert: src => {
-                        Object.entries(targetIcons).forEach(([target, targetIcon]) => {
+                        for (const [target, targetIcon] of Object.entries(targetIcons)) {
                             if (src === targetIcon) return target;
-                        });
+                        }
                     },
                 },
             },
