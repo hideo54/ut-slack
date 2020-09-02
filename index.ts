@@ -25,7 +25,7 @@ const plugins = [
     require('./channel-notifier'),
     require('./kanaiWatcher'),
     require('./kyomuWatcher'),
-    require('./onlineLectureInfoWatcher'),
+    // require('./onlineLectureInfoWatcher'),
     // require('./slideFiller'),
 ];
 
