@@ -7,7 +7,7 @@
     "@hideo54/pdf-exposer": "^1.1.1",
     "@slack/events-api": "^2.3.2",
     "@slack/web-api": "^5.1.0",
-    "@types/cheerio": "^0.22.13",
+    "@types/cheerio": "^0.22.21",
     "@types/common-tags": "^1.8.0",
     "@types/diff": "^4.0.2",
     "@types/jsdom": "^12.2.4",
